@@ -21,7 +21,7 @@ fclean: clean
 
 gpush: fclean
 	git add .
-	git commit -m "first"
+	git commit -m "bias fix"
 	git push
 
 re: fclean all

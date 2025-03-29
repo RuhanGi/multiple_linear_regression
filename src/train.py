@@ -86,8 +86,8 @@ def trainModel(data, n):
 		for i in range(n):
 			ndata[:, i] = normalize(data[:, i])
 		ndata, act = ndata[:, :-1], ndata[:, -1]
-		maxiterations = 100000
-		tolerance = 10**-6
+		maxiterations = 10000000
+		tolerance = 10**-10
 		while True:
 			prvth = th.copy()
 			th = epoch(ndata, act, th)
@@ -97,9 +97,7 @@ def trainModel(data, n):
 
 		for i in range(n-1):
 			th[i+1] *= rang(data[:,n-1]) / rang(data[:,i])
-		th[0] *= rang(data[:,n-1]) / np.prod([rang(data[:, i]) for i in range(n-1)])
-		th[0] += np.min(data[:,n-1]) - np.sum([(th[i+1] * np.min(data[:,i]) / rang(data[:,i])) for i in range(n-1)])
-		
+		th[0] = np.min(data[:, n-1]) + th[0] * rang(data[:, n-1]) - np.sum(th[1:] * np.array([np.min(data[:, i]) for i in range(n-1)]))
 		return th
 	except Exception as e:
 		print(RED + "Error: " + str(e) + RESET)
@@ -118,6 +116,7 @@ def main():
 	th = trainModel(data, n)
 	np.set_printoptions(suppress=True)
 	print(th)
+	print("R² =", r(data[:,-1], th[0] + np.dot(data[:,:-1], th[1:])))
 	np.save("thetas.npy", th)
 	# np.save("thetas.npy", np.array([1000, 100, 10, 1]))
 
