@@ -86,8 +86,8 @@ def trainModel(data, n):
 		for i in range(n):
 			ndata[:, i] = normalize(data[:, i])
 		ndata, act = ndata[:, :-1], ndata[:, -1]
-		maxiterations = 10000000
-		tolerance = 10**-10
+		maxiterations = 1000000
+		tolerance = 10**-12
 		while True:
 			prvth = th.copy()
 			th = epoch(ndata, act, th)
