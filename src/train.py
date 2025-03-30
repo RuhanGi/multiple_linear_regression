@@ -28,9 +28,6 @@ def r(x, y):
 	den = np.sqrt(np.sum((x - meanx) ** 2) * np.sum((y - meany) ** 2))
 	return num / (den) if den != 0 else 0
 
-def normalize(data):
-	return (data - np.min(data)) / (np.max(data) - np.min(data))
-
 def plot(headers, data, th0, th1):
 	try:
 		kms, prices = data[:, 0], data[:, 1]
@@ -70,14 +67,11 @@ def loadData(fil):
 
 def epoch(ndata, act, th):
 	learningRate = 0.001
-	npred = th[0] + np.dot(ndata, th[1:])
 	m = len(ndata)
-	tmp0 = learningRate / m * np.sum(npred - act)
-	tmpr = learningRate / m * np.dot((npred - act).T, ndata)
-	return th - np.concatenate(([tmp0], tmpr))
-
-def rang(data):
-	return np.max(data) - np.min(data)
+	diff = (th[0] + np.dot(ndata, th[1:])) - act
+	th[0] -= learningRate / m * np.sum(diff)
+	th[1:] -= learningRate / m * (diff @ ndata)
+	return th
 
 def trainModel(data, n):
 	try:
@@ -85,20 +79,21 @@ def trainModel(data, n):
 		mins = np.min(data, axis=0)
 		maxs = np.max(data, axis=0)
 		ranges = maxs - mins
+		ranges[ranges == 0] = 1
 		ndata = (data - mins) / ranges
 		ndata, act = ndata[:, :-1], ndata[:, -1]
 		maxiterations = 1000000
 		tolerance = 10**-8
-		while True:
+		
+		for _ in range(maxiterations):
 			prvth = th.copy()
 			th = epoch(ndata, act, th)
-			maxiterations -= 1
-			if maxiterations % 1000 == 0 and np.all(np.abs(th - prvth) < tolerance) or maxiterations == 0:
+			if maxiterations % 1000 == 0 and np.all(np.abs(th - prvth) < tolerance):
 				break
 
 		for i in range(n-1):
 			th[i+1] *= ranges[n-1] / ranges[i]
-		th[0] = mins[n-1] + th[0] * ranges[n-1] - np.sum(th[1:] * mins[:n-1])
+		th[0] = mins[-1] + th[0] * ranges[-1] - np.sum(th[1:] * mins[:-1])
 		return th
 	except Exception as e:
 		print(RED + "Error: " + str(e) + RESET)
