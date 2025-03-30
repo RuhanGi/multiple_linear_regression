@@ -82,9 +82,10 @@ def rang(data):
 def trainModel(data, n):
 	try:
 		th = np.zeros(n)
-		ndata = data.copy()
-		for i in range(n):
-			ndata[:, i] = normalize(data[:, i])
+		mins = np.min(data, axis=0)
+		maxs = np.max(data, axis=0)
+		ranges = maxs - mins
+		ndata = (data - mins) / ranges
 		ndata, act = ndata[:, :-1], ndata[:, -1]
 		maxiterations = 1000000
 		tolerance = 10**-8
@@ -96,8 +97,8 @@ def trainModel(data, n):
 				break
 
 		for i in range(n-1):
-			th[i+1] *= rang(data[:,n-1]) / rang(data[:,i])
-		th[0] = np.min(data[:, n-1]) + th[0] * rang(data[:, n-1]) - np.sum(th[1:] * np.array([np.min(data[:, i]) for i in range(n-1)]))
+			th[i+1] *= ranges[n-1] / ranges[i]
+		th[0] = mins[n-1] + th[0] * ranges[n-1] - np.sum(th[1:] * mins[:n-1])
 		return th
 	except Exception as e:
 		print(RED + "Error: " + str(e) + RESET)
@@ -114,6 +115,8 @@ def main():
 		sys.exit(1)
 	
 	th = trainModel(data, n)
+	np.set_printoptions(suppress=True, precision=6)
+	print(th)
 	print("R² =", r(data[:,-1], th[0] + np.dot(data[:,:-1], th[1:])))
 	np.save("thetas.npy", th)
 
