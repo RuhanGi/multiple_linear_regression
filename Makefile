@@ -21,7 +21,7 @@ fclean: clean
 
 gpush: fclean
 	git add .
-	git commit -m "hyperparameters tweaked"
+	git commit -m "efficiency increased"
 	git push
 
 re: fclean all

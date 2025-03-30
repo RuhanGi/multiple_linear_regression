@@ -92,7 +92,7 @@ def trainModel(data, n):
 			prvth = th.copy()
 			th = epoch(ndata, act, th)
 			maxiterations -= 1
-			if np.all(np.abs(th - prvth) < tolerance) or maxiterations == 0:
+			if maxiterations % 1000 == 0 and np.all(np.abs(th - prvth) < tolerance) or maxiterations == 0:
 				break
 
 		for i in range(n-1):
