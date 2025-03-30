@@ -87,7 +87,7 @@ def trainModel(data, n):
 			ndata[:, i] = normalize(data[:, i])
 		ndata, act = ndata[:, :-1], ndata[:, -1]
 		maxiterations = 1000000
-		tolerance = 10**-12
+		tolerance = 10**-8
 		while True:
 			prvth = th.copy()
 			th = epoch(ndata, act, th)
@@ -114,11 +114,8 @@ def main():
 		sys.exit(1)
 	
 	th = trainModel(data, n)
-	np.set_printoptions(suppress=True)
-	print(th)
 	print("R² =", r(data[:,-1], th[0] + np.dot(data[:,:-1], th[1:])))
 	np.save("thetas.npy", th)
-	# np.save("thetas.npy", np.array([1000, 100, 10, 1]))
 
 if __name__ == "__main__":
 	main()

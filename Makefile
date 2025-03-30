@@ -21,7 +21,7 @@ fclean: clean
 
 gpush: fclean
 	git add .
-	git commit -m "bias fix"
+	git commit -m "hyperparameters tweaked"
 	git push
 
 re: fclean all
