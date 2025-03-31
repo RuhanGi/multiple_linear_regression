@@ -34,8 +34,8 @@ def r(x, y):
 	den = np.sqrt(np.sum((x - meanx) ** 2) * np.sum((y - meany) ** 2))
 	return num / (den) if den != 0 else 0
 
-def rpartial(x, y):
-	return r(x,y)
+def rpartial(xy, xx, yy):
+	return -xy/np.sqrt(xx*yy) if xx * yy != 0 else 0
 
 def loadData(fil):
 	try:
@@ -65,10 +65,10 @@ def trainModel(data, n):
 		maxiterations = 1000000
 		tolerance = 10**-12
 		
-		for _ in range(maxiterations):
+		for i in range(maxiterations):
 			prvth = th.copy()
 			th = epoch(ndata, act, th)
-			if maxiterations % 1000 == 0 and np.all(np.abs(th - prvth) < tolerance):
+			if i % 1000 == 0 and np.all(np.abs(th - prvth) < tolerance):
 				break
 
 		for i in range(n-1):
@@ -79,8 +79,9 @@ def trainModel(data, n):
 		print(RED + "Error: " + str(e) + RESET)
 		sys.exit(1)
 
-def plot(headers, data, ind, n, th):
+def plot(headers, full, n, th):
 	try:
+		data, ind = full[:,:-1], full[:,-1]
 		prd = th[0] + np.dot(data, th[1:])
 		diff = ind - prd
 
@@ -99,8 +100,10 @@ def plot(headers, data, ind, n, th):
 			f"Adjusted R² = {arsqr(ind, prd, len(ind), n-1):.4f}",
 			fontsize=12, ha='center', va='center', y=0.98)
 
-		# TODO with r and partial r
 		means = np.mean(data, axis=0)
+
+		Rinv = np.array([[r(full[:, i], full[:, j]) for j in range(n)] for i in range(n)])
+		Rinv = np.linalg.inv(Rinv)
 		for i in range(n-1):
 			line = th[0] + th[i+1] * data[:, i] + sum(th[j+1] * means[j] if j != i else 0 for j in range(n-1))
 			ax[0, i].scatter(data[:, i], ind, color='red', label="Data")
@@ -110,8 +113,8 @@ def plot(headers, data, ind, n, th):
 			xlim, ylim = ax[0, i].get_xlim(), ax[0, i].get_ylim()
 			ax[0, i].text(xlim[1] - 0.45 * (xlim[1]-xlim[0]), ylim[0] + 0.01 * (ylim[1]-ylim[0]),
 					f"r={r(data[:,i], ind):.4f}\n"
-					f"r*={rpartial(data[:,i], ind):.4f}", color = 'navy')
-
+					f"r*={rpartial(Rinv[i,-1], Rinv[i,i], Rinv[-1,-1]):.4f}", color = 'navy')
+			print(f"r={r(data[:,i], ind):.4f}", f"r*={rpartial(Rinv[i,-1], Rinv[i,i], Rinv[-1,-1]):.4f}")
 		for i in range(n-1):
 			ax[1, i].scatter(data[:, i], diff, color='gray', label="Residuals")
 			ax[1, i].axhline(y=0, color='black', label="Axis")
@@ -141,7 +144,7 @@ def main():
 
 	th = trainModel(data, n)
 	np.save("thetas.npy", {"theta": th, "headers": headers})
-	plot(headers, data[:,:-1], data[:,-1], n, th)
+	plot(headers, data, n, th)
 
 if __name__ == "__main__":
 	main()

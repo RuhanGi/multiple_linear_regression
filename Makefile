@@ -25,7 +25,7 @@ fclean: clean
 
 gpush: fclean
 	git add .
-	git commit -m "plot+stats"
+	git commit -m "partial r"
 	git push
 
 re: fclean all

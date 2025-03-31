@@ -10,10 +10,12 @@ def generate_data(n, filename):
 			age = random.uniform(0, 100)
 			taste = random.uniform(0, 10)
 			units = random.uniform(1, 200000)
-			y = (50 + 5 * age + 10 * taste - 1/2000 * units) * random.uniform(1-r, 1+r)
+			y = (50 + 5 * age + 10 * taste - 1/2000 * units) * random.gauss(1, r)
+			# random.uniform(1-r, 1+r)
+			# TODO try age**2, normal distributions, verify rpartial
 			writer.writerow([age, taste, units, y])
 
-n = 100
+n = 10000
 filename = "test/line.csv"
 
 generate_data(n, filename)
