@@ -25,7 +25,7 @@ fclean: clean
 
 gpush: fclean
 	git add .
-	git commit -m "partial r"
+	git commit -m "parse"
 	git push
 
 re: fclean all

@@ -32,15 +32,17 @@ def r(x, y):
 	meanx, meany = np.mean(x), np.mean(y)
 	num = np.sum((x - meanx) * (y - meany))
 	den = np.sqrt(np.sum((x - meanx) ** 2) * np.sum((y - meany) ** 2))
-	return num / (den) if den != 0 else 0
+	return num / den if den != 0 else 0
 
 def rpartial(xy, xx, yy):
-	return -xy/np.sqrt(xx*yy) if xx * yy != 0 else 0
+	return -xy / np.sqrt(xx * yy) if xx * yy != 0 else 0
 
 def loadData(fil):
 	try:
 		headers = np.genfromtxt(fil, delimiter=",", dtype=str, max_rows=1)
-		return headers, np.loadtxt(fil, delimiter=",", skiprows=1)
+		data = np.loadtxt(fil, delimiter=",", skiprows=1)
+		data = data[~(np.isnan(data) | np.isinf(data)).any(axis=1)]
+		return headers, data
 	except Exception as e:
 		print(RED + "Error: " + str(e) + RESET)
 		sys.exit(1)
