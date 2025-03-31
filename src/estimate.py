@@ -20,36 +20,28 @@ def loadHeaders(fil):
 
 def load():
 	try:
-		return np.load("thetas.npy")
+		data = np.load("thetas.npy", allow_pickle=True).item()
+		return data['theta'], data['headers']
 	except:
-		print(RED + "Improper trained file!" + RESET)
-		return 0, 0
+		print(RED + "No properly trained file found!" + RESET)
+		return [0,0], ["Independent Variable", "Dependent Variable"]
 
 def get(name):
 	try:
 		return float(input(BLUE + name + ": " + YELLOW))
 	except:
 		print(RED + "Input a Number!" + RESET)
-		sys.exit(1)
+		return get(name)
 
 def main():
-	if len(sys.argv) > 2:
-		print(RED + "Pass Only the Training File!" + RESET)
-		sys.exit(1)
-
-	headers = loadHeaders(sys.argv[1]) if len(sys.argv) == 2 else None
-	theta = load()
+	theta, headers = load()
 	n = len(theta)
-
-	if (headers is not None and n != len(headers)) or (headers is None and len(sys.argv) > 1):
-		print(RED + "Header and Trained File Don't Match!" + RESET)
-		sys.exit(1)
 
 	prediction = theta[0]
 	for i in range (n-1):
-		prediction += theta[i+1] * get(headers[i] if headers is not None else f"Dependent Variable {i+1}")
+		prediction += theta[i+1] * get(headers[i])
 
-	print(GREEN + f"Estimated {headers[n-1] if headers is not None else 'Independent Variable'}: ")
+	print(GREEN + f"Estimated {headers[n-1]}: ")
 	print(CYAN + f"{prediction:0.4f}".rstrip('0').rstrip('.') + RESET)
 
 if __name__ == "__main__":

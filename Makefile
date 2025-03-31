@@ -10,8 +10,12 @@ all:
 	python3 $(SRCDIR)/train.py $(TSTDIR)/line.csv \
 	&& printf "\x1B[32m Model Trained!\x1B[0m\n" || true
 
+s:
+	python3 $(SRCDIR)/train.py $(TSTDIR)/cardata.csv \
+	&& printf "\x1B[32m Model Trained!\x1B[0m\n" || true
+
 e:
-	python3 $(SRCDIR)/estimate.py $(TSTDIR)/line.csv
+	python3 $(SRCDIR)/estimate.py || true
 
 clean:
 	rm -rf $(TSTDIR)/line.csv
@@ -21,7 +25,7 @@ fclean: clean
 
 gpush: fclean
 	git add .
-	git commit -m "efficiency increased"
+	git commit -m "plot+stats"
 	git push
 
 re: fclean all
