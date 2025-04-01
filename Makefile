@@ -25,7 +25,7 @@ fclean: clean
 
 gpush: fclean
 	git add .
-	git commit -m "parse"
+	git commit -m "r modded"
 	git push
 
 re: fclean all

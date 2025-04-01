@@ -104,8 +104,8 @@ def plot(headers, full, n, th):
 
 		means = np.mean(data, axis=0)
 
-		Rinv = np.array([[r(full[:, i], full[:, j]) for j in range(n)] for i in range(n)])
-		Rinv = np.linalg.inv(Rinv)
+		Rmat = np.array([[r(full[:, i], full[:, j]) for j in range(n)] for i in range(n)])
+		Rinv = np.linalg.inv(Rmat)
 		for i in range(n-1):
 			line = th[0] + th[i+1] * data[:, i] + sum(th[j+1] * means[j] if j != i else 0 for j in range(n-1))
 			ax[0, i].scatter(data[:, i], ind, color='red', label="Data")
@@ -114,9 +114,8 @@ def plot(headers, full, n, th):
 			ax[0, i].set_ylabel(headers[n-1])
 			xlim, ylim = ax[0, i].get_xlim(), ax[0, i].get_ylim()
 			ax[0, i].text(xlim[1] - 0.45 * (xlim[1]-xlim[0]), ylim[0] + 0.01 * (ylim[1]-ylim[0]),
-					f"r={r(data[:,i], ind):.4f}\n"
-					f"r*={rpartial(Rinv[i,-1], Rinv[i,i], Rinv[-1,-1]):.4f}", color = 'navy')
-			print(f"r={r(data[:,i], ind):.4f}", f"r*={rpartial(Rinv[i,-1], Rinv[i,i], Rinv[-1,-1]):.4f}")
+					f"r={Rmat[i, -1]:.4f}\n"
+					+ (f"r*={rpartial(Rinv[i,-1], Rinv[i,i], Rinv[-1,-1]):.4f}" if n > 2 else ""), color = 'navy')
 		for i in range(n-1):
 			ax[1, i].scatter(data[:, i], diff, color='gray', label="Residuals")
 			ax[1, i].axhline(y=0, color='black', label="Axis")
