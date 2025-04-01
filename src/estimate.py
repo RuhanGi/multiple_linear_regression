@@ -21,6 +21,8 @@ def loadHeaders(fil):
 def load():
 	try:
 		data = np.load("thetas.npy", allow_pickle=True).item()
+		if len(data['theta']) != len(data['headers']):
+			raise
 		return data['theta'], data['headers']
 	except:
 		print(RED + "No properly trained file found!" + RESET)

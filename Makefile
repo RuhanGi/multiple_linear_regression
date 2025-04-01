@@ -34,7 +34,7 @@ fclean: clean
 
 gpush: fclean
 	git add .
-	git commit -m "added package check"
+	git commit -m "check estimate"
 	git push
 
 re: fclean all
