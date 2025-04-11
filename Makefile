@@ -34,7 +34,7 @@ fclean: clean
 
 gpush: fclean
 	git add .
-	git commit -m "csv"
+	git commit -m "tweaks"
 	git push
 
 re: fclean all
