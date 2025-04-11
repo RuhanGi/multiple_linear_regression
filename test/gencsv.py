@@ -6,7 +6,7 @@ def generate_data(n, filename):
 	with open(filename, mode='w', newline='') as file:
 		writer = csv.writer(file)
 		writer.writerow(['Age (years)', 'Taste Rating', 'Availability (units)', 'Price ($)'])
-		r = 10
+		r = 2
 		for _ in range(n):
 			age = random.uniform(0, 100)
 			taste = random.uniform(0, 10)

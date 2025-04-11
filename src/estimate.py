@@ -1,4 +1,4 @@
-import numpy as np
+import csv
 import sys
 
 RED = "\033[91m"
@@ -11,19 +11,16 @@ GRAY = "\033[97m"
 BLACK = "\033[98m"
 RESET = "\033[0m"
 
-def loadHeaders(fil):
+def load(fil):
 	try:
-		return np.genfromtxt(fil, delimiter=",", dtype=str, max_rows=1)
-	except Exception as e:
-		print(RED + "Error: " + str(e) + RESET)
-		sys.exit(1)
-
-def load():
-	try:
-		data = np.load("thetas.npy", allow_pickle=True).item()
-		if len(data['theta']) != len(data['headers']):
+		with open(fil, mode="r") as file:
+			reader = csv.reader(file)
+			headers = next(reader)
+			thetas = next(reader)
+			thetas = [float(theta) for theta in thetas]
+		if len(thetas) != len(headers):
 			raise
-		return data['theta'], data['headers']
+		return thetas, headers
 	except:
 		print(RED + "No properly trained file found!" + RESET)
 		return [0,0], ["Independent Variable", "Dependent Variable"]
@@ -36,15 +33,18 @@ def get(name):
 		return get(name)
 
 def main():
-	theta, headers = load()
+	if len(sys.argv) != 2:
+		print(RED + "Pass Weights Data!" + RESET)
+		sys.exit(1)
+	theta, headers = load(sys.argv[1])
 	n = len(theta)
 
-	prediction = theta[0]
+	prediction = theta[n-1]
 	for i in range (n-1):
-		prediction += theta[i+1] * get(headers[i])
+		prediction += theta[i] * get(headers[i])
 
 	print(GREEN + f"Estimated {headers[n-1]}: ")
-	print(CYAN + f"{prediction:0.4f}".rstrip('0').rstrip('.') + RESET)
+	print(CYAN + f"{prediction:.2f}" + RESET)
 
 if __name__ == "__main__":
 	main()

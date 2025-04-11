@@ -89,21 +89,21 @@ def plot(headers, full, n, th):
 
 		fig, ax = plt.subplots(2, n-1, figsize=(9, 6))
 		fig.subplots_adjust(hspace=0.3, wspace=0.5)
-		if n == 2:
-			ax = np.reshape(ax, (2, 1))
-
 		equation = f"{headers[n-1]} = {th[0]:.4f}" + "".join([f" + {th[i+1]:.4f} * {headers[i]}" for i in range(n-1)])
-		fig.suptitle(
-			"\n\nEvaluation Metrics\n"
+		metrics = (
+			f"\n\nEvaluation Metrics\n"
 			f"{equation}"
 			f"\nRMSE = {rmse(ind, prd):.2f}, "
 			f"MAE = {mae(ind, prd):.2f}, "
-			f"R² = {rsqr(ind, prd):.4f}, "
-			f"Adjusted R² = {arsqr(ind, prd, len(ind), n-1):.4f}",
-			fontsize=12, ha='center', va='center', y=0.98)
+			f"R² = {rsqr(ind, prd):.4f}"
+		)
+		if n == 2:
+			ax = np.reshape(ax, (2, 1))
+		else:
+			metrics += f", Adjusted R² = {arsqr(ind, prd, len(ind), n-1):.4f}"
 
+		fig.suptitle(metrics, fontsize=12, ha='center', va='center', y=0.98)
 		means = np.mean(data, axis=0)
-
 		Rmat = np.array([[r(full[:, i], full[:, j]) for j in range(n)] for i in range(n)])
 		Rinv = np.linalg.inv(Rmat)
 		for i in range(n-1):
@@ -132,6 +132,7 @@ def plot(headers, full, n, th):
 		print(RED + "Error in Plotting: " + str(e) + RESET)
 		sys.exit(1)
 
+
 def main():
 	if len(sys.argv) != 2:
 		print(RED + "Pass Training Data!" + RESET)
@@ -144,7 +145,10 @@ def main():
 		sys.exit(1)
 
 	th = trainModel(data, n)
-	np.save("thetas.npy", {"theta": th, "headers": headers})
+	with open("thetas.csv", mode="w", newline="") as file:
+		writer = csv.writer(file)
+		writer.writerow(headers)
+		writer.writerow(list(th[1:]) + [th[0]])
 	plot(headers, data, n, th)
 
 if __name__ == "__main__":
